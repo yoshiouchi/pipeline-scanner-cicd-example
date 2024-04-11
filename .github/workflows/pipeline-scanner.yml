@@ -1,9 +1,8 @@
 name: Container Image Security Scan
 
 on:
-  workflow_dispatch:
   schedule:
-    - cron: "0 22-23,0-23 * * *" # Every week on Saturday at 6pm
+    - cron: "10 22 * * *" # Every week on Saturday at 6pm
 
 env:
   SYSDIG_URL: https://app.au1.sysdig.com
