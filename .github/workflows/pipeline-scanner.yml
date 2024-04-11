@@ -2,7 +2,7 @@ name: Container Image Security Scan
 
 on:
   schedule:
-    - cron: "10 22 * * *" # Every week on Saturday at 6pm
+    - cron: "20 11 * * *" # Every day at 11:20 UTC (10:20pm AEST)
 
 env:
   SYSDIG_URL: https://app.au1.sysdig.com
