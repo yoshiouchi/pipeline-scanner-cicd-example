@@ -13,8 +13,8 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout Workflow
-    - uses: actions/checkout@v3
+    - name: Checkout workflow
+      uses: actions/checkout@v3
     
     - name: Install Sysdig CLI Scanner
       run: |
