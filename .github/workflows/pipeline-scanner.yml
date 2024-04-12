@@ -33,20 +33,14 @@ jobs:
         images=$(aws ecr describe-images --repository-name ${{ env.ECR_REPO_NAME }} --region ${{ env.AWS_REGION }} --query 'imageDetails[*].[repositoryName, imageTags[]]' --output text)
         full_images=""
         while IFS=$'\t' read -r repo_name image_tag; do
-          echo "image_tag: $image_tag"
-
           
-          full_image="${{ secrets.ECR_REGISTRY }}/${{ env.ECR_REPO_NAME }}:$image_tag"
+          full_image="${{ secrets.ECR_REGISTRY }}/${{ env.ECR_REPO_NAME }}:${image_tag}"
 
           echo "FullImage: $full_image"
           
         done <<< "$images"
-        # Remove leading and trailing whitespaces
-        full_images=$(echo "$full_images" | xargs)
         
         echo "Images: $full_images"
-        
-        echo "::set-output name=images::$full_images"
     
     - name: Install Sysdig CLI Scanner
       run: |
