@@ -30,6 +30,7 @@ jobs:
       id: list_images
       run: |
         images=$(aws ecr describe-images --repository-name ${{ env.ECR_REPO_NAME }} --region ${{ env.AWS_REGION }} --query 'imageDetails[*].imageDigest' --output text)
+        echo "Images: $images"
         echo "::set-output name=images::$images"
     
     - name: Install Sysdig CLI Scanner
