@@ -7,56 +7,24 @@ on:
 
 env:
   SYSDIG_URL: https://app.au1.sysdig.com
-  AWS_REGION: ap-southeast-2
-  ECR_REPO_NAME: yoshi-ecr-repository
-  ECR_REGISTRY: 457076078044.dkr.ecr.ap-southeast-2.amazonaws.com
   BYPASS_SCAN_FAIL: false
-
 jobs:
   scan_images:
     runs-on: ubuntu-latest
     
     steps:
-    - name: Checkout workflow
+    - name: Checkout code
       uses: actions/checkout@v4
-
-    - name: Authenticate with AWS ECR
-      run: |
-        aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws configure set default.region ${{ env.AWS_REGION }}
-        aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
-
-    - name: List images in ECR repository
-      id: list_images
-      run: |
-        images=$(aws ecr describe-images --repository-name ${{ env.ECR_REPO_NAME }} --region ${{ env.AWS_REGION }} --query 'imageDetails[*].[repositoryName, imageTags[]]' --output text)
-        full_images=""
-        while IFS=$'\t' read -r repo_name image_tags; do
-          
-          for image_tag in $image_tags; do
-            full_image="${{ secrets.ECR_REGISTRY }}/${env.ECR_REPO_NAME}:${image_tag}"
-
-            echo "FI: $full_image"
-            
-            full_images="$full_images $full_image"
-          done
-        done <<< "$images"
-        # Remove leading and trailing whitespaces
-        full_images=$(echo "$full_images" | xargs)
-        echo "::set-output name=images::$full_images"
-        echo "FullImage: $full_images"
     
     - name: Install Sysdig CLI Scanner
       run: |
         curl -LO "https://download.sysdig.com/scanning/bin/sysdig-cli-scanner/$(curl -L -s https://download.sysdig.com/scanning/sysdig-cli-scanner/latest_version.txt)/linux/amd64/sysdig-cli-scanner"
         chmod +x ./sysdig-cli-scanner
-
     - name: Scan images
       run: |
-        # Specify your image(s) here
-        # images=("nginx:1.24.0-alpine" "redis:7.0.15-alpine")
+        # Define your Docker image names here
+        images=("nginx:1.24.0-alpine" "redis:7.0.15-alpine")
         for image in "${images[@]}"
         do
-          SECURE_API_TOKEN=${{ secrets.SECURE_API_TOKEN }} ./sysdig-cli-scanner --apiurl ${{ env.SYSDIG_URL }} "$image" || ${{ env.BYPASS_SCAN_FAIL }}
+          SECURE_API_TOKEN=${{ secrets.SECURE_API_TOKEN }} ./sysdig-cli-scanner --apiurl ${{env.SYSDIG_URL}} "$image" || ${{ env.BYPASS_SCAN_FAIL }}
         done
