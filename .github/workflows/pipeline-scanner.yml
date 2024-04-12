@@ -1,4 +1,4 @@
-name: Container Image Security Scan
+name: Sysdig Pipeline Scan
 
 on:
   schedule:
@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+    - name: Checkout Workflow
     - uses: actions/checkout@v3
     
     - name: Install Sysdig CLI Scanner
@@ -20,9 +21,9 @@ jobs:
         curl -LO "https://download.sysdig.com/scanning/bin/sysdig-cli-scanner/$(curl -L -s https://download.sysdig.com/scanning/sysdig-cli-scanner/latest_version.txt)/linux/amd64/sysdig-cli-scanner"
         chmod +x ./sysdig-cli-scanner
 
-    - name: Scan Docker images
+    - name: Scan images
       run: |
-        # Define your Docker image names here
+        # Specify your image(s) here
         images=("nginx:1.24.0-alpine" "redis:7.0.15-alpine")
         for image in "${images[@]}"
         do
