@@ -1,11 +1,14 @@
 name: Sysdig Pipeline Scan
 
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 0 * * *'
 
 env:
   SYSDIG_URL: https://app.au1.sysdig.com
+  AWS_REGION: ap-southeast-2
+  ECR_REPO_NAME: yoshi-ecr-repository
   BYPASS_SCAN_FAIL: false
 
 jobs:
@@ -15,6 +18,15 @@ jobs:
     steps:
     - name: Checkout workflow
       uses: actions/checkout@v3
+
+    - name: Authenticate with AWS ECR
+      run: aws ecr get-login-password --region ${{env.AWS_REGION}} | docker login --username AWS --password-stdin ${{secrets.ECR_REGISTRY}}
+
+    - name: List images in ECR repository
+      id: list_images
+      run: |
+        images=$(aws ecr describe-images --repository-name ${{ECR_REPO_NAME}} --region ${{env.AWS_REGION}} --query 'imageDetails[*].imageDigest' --output text)
+        echo "::set-output name=images::$images"
     
     - name: Install Sysdig CLI Scanner
       run: |
@@ -24,7 +36,7 @@ jobs:
     - name: Scan images
       run: |
         # Specify your image(s) here
-        images=("nginx:1.24.0-alpine" "redis:7.0.15-alpine")
+        # images=("nginx:1.24.0-alpine" "redis:7.0.15-alpine")
         for image in "${images[@]}"
         do
           SECURE_API_TOKEN=${{ secrets.SECURE_API_TOKEN }} ./sysdig-cli-scanner --apiurl ${{env.SYSDIG_URL}} "$image" || ${{ env.BYPASS_SCAN_FAIL }}
