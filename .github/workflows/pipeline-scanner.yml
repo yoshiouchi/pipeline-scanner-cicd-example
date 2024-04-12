@@ -39,8 +39,6 @@ jobs:
           echo "FullImage: $full_image"
           
         done <<< "$images"
-        
-        echo "Images: $full_images"
     
     - name: Install Sysdig CLI Scanner
       run: |
