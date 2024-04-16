@@ -5,7 +5,7 @@ name: Sysdig Pipeline Scan
 
 on:
   # Uncomment this for a manual trigger in GitHub Workflow
-  workflow_dispatch:
+  # workflow_dispatch:
 
   # Set the CronJob to run the scanner periodically
   schedule:
