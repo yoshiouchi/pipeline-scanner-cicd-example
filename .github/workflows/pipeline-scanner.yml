@@ -5,11 +5,11 @@ name: Sysdig Pipeline Scan
 
 on:
   # Uncomment this for a manual trigger in GitHub Workflow
-  # workflow_dispatch:
+  workflow_dispatch:
 
   # Set the CronJob to run the scanner periodically
-  schedule:
-    - cron: '0 0 * * *' # Runs at midnight (0:00 AM) every day
+  # schedule:
+  #   - cron: '0 0 * * *' # Runs at midnight (0:00 AM) every day
 
 env:
   # Set SYSDIG_URL based on your Sysdig SaaS Region
